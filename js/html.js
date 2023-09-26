@@ -19,7 +19,7 @@ const render = (arr, label, index) => {
 }
 
 const id = () => {
-    
+        
 }
 
-export { render }
+export { render, id }

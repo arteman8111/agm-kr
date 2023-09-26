@@ -111,3 +111,11 @@ const angle__header = ['μ, [град]','β, [град]']
 render(arr, data__header,0)
 render(thet__arr,thet__header,1)
 render(angle__arr,angle__header,1)
+
+console.log(param.h);
+console.log(param.M_inf);
+console.log(param.alfa);
+console.log(param.T_st);
+console.log(param.Re_k);
+console.log(param.c);
+console.log(param.b);
