@@ -4,4 +4,28 @@
     margin: 0 auto;
     padding: 0 50px;
 }
-  
+
+.render__title {
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+    -webkit-box-shadow: 0px 5px 5px -5px rgba(34, 60, 80, 0.6);
+    -moz-box-shadow: 0px 5px 5px -5px rgba(34, 60, 80, 0.6);
+    box-shadow: 0px 5px 5px -5px rgba(34, 60, 80, 0.6);
+}
+
+.data {
+    border: 1px solid gray;
+    border-collapse: collapse;
+    text-align: center;
+    width: 100%;
+    margin-top: 25px;
+}
+
+.data__element {
+    border:1px solid gray;
+}
+
+.data__element:first-child {
+    font-weight: 700;
+}
