@@ -1,4 +1,4 @@
-import * as param from "./const.js"
+import * as param from "../variables/const.js"
 
 const Re = (M) => {
     let x = (param.T_st - 1) / (M * M)

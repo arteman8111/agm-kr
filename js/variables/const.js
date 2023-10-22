@@ -1,5 +1,6 @@
 // ИД для всех
-const N = 5; // Номер варианта из ЭУ
+// Мой вариант 4
+const N = 4; // Номер варианта из ЭУ
 const h = (10 + 0.4*N) * math.pow(10,3) // Геометрическая высота [м]
 const M_inf = 4.5 + 0.1*N // Число Маха для набегающего потока [-]
 const alfa = 2 + 0.1*N // угол атаки [град]
@@ -12,6 +13,9 @@ const c = 80 * math.pow(10,-3) // мм
 const b = 1000 * math.pow(10,-3) // мм 
 const k = 1.4 // адиабата
 const betta_k = math.atan(c/b)
+const q_inf = 3.875 * math.pow(10, 5) // кг/мс^2 || скоростной напор
+const L = math.sqrt(math.pow(b / 2, 2) + math.pow(c / 2, 2)); // Длина грани
+
 
 export {
     N,
@@ -26,5 +30,7 @@ export {
     c,
     b,
     k,
-    betta_k
+    betta_k,
+    q_inf,
+    L
 }

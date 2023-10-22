@@ -1,4 +1,4 @@
-import { k } from "./const.js";
+import { k } from "../variables/const.js";
 
 const pi = M => math.pow(1 + math.pow(M, 2) * (k - 1) / 2, k / (k - 1)); // для отношения pi = p/p0
 const eps = M => math.pow(1 + math.pow(M, 2) * (k - 1) / 2, 1 / (k - 1)); // для отношения eps = po/po0

@@ -1,4 +1,4 @@
-import { k, betta_k } from "./const.js";
+import { k, betta_k } from "../variables/const.js";
 
 const w = (M) => math.sqrt((k + 1) / (k - 1)) * math.atan(math.sqrt((M * M - 1) * (k - 1) / (k + 1))) - math.atan(math.sqrt(M * M - 1))
 const w_next = (w) => w + 2 * betta_k

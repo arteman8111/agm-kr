@@ -1,4 +1,4 @@
-import { cp0, u0, lymbda0 } from "./const.js";
+import { cp0, u0, lymbda0 } from "../variables/const.js";
 const fi = 0.1;
 const n = 0.76;
 const psi = 0.85;

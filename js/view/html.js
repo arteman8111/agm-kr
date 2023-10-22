@@ -11,15 +11,11 @@ const render = (arr, label, index) => {
     for (let i = 0; i < arr.length; i++) {
         const tr = document.createElement('tr');
         tr.insertAdjacentHTML('beforeend',td(label[i]))
-        arr[i].forEach(element => tr.insertAdjacentHTML('beforeend', td(math.format(element,3))))
+        arr[i].forEach(element => tr.insertAdjacentHTML('beforeend', td(math.format(element, {notation: 'exponential', precision: 5}))))
         table.insertAdjacentElement('beforeend', tr)
     }
     table.insertAdjacentElement('afterbegin', header)
     app.insertAdjacentElement('beforeend', table)
 }
 
-const id = () => {
-        
-}
-
-export { render, id }
+export { render }
