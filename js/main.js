@@ -8,7 +8,6 @@ import { tau, pi, eps } from "./functions/gasodynamic.js"
 import { cp_koeff, u_koeff, lymbda_koeff } from "./functions/koeff.js"
 import { betta, thet, M, p, po, T, a, v, um, p0, po0, T0, cp, u, lymbda } from "./variables/arr.js"
 import { render } from "./view/html.js";
-import { X, Y, Mk, Cxa, Cya, Cx, Cy, mz, Mz } from "./functions/ADH.js"
 
 for (let i = 0; i <= 2; i++) {
     if (i < 2) {
@@ -96,7 +95,7 @@ render(angle__arr, angle__header, 1)
 const getOprTemp = (flow, T, M) => {
     const Cp_opr = T => 1004.7 * math.pow(T / 288.15, 0.1);
     const u_opr = T => 1.79 * math.pow(10, -5) * math.pow(T / 288.15, 0.76);
-    const lymbda_opr = T => 0.0232 * math.pow(T / 288.15, 0.86);
+    const lymbda_opr = T => 0.0232 * math.pow(T / 261, 0.86);
 
     const r_opr = (Cp, u, lymbda, extent) => math.pow(Cp * u / lymbda, extent);
     const Tr_opr = (T, r, M) => T * (1 + r * (param.k - 1) * M * M / 2);
@@ -137,14 +136,40 @@ for (let i = 1; i <= 4; i++) {
 const T_opr_header = ['Tr (л), [K]', 'T* (л), [K]', 'Tr (т), [K]', 'T* (т), [K]'];
 render([Tr_laminar, T_opr_laminar, Tr_turb, T_opr_turb], T_opr_header, 1);
 
-const C_x = Cx(X(p[1], p[0]), X(p[2], p[0]), X(p[3], p[0]), X(p[4], p[0]));
-const C_y = Cy(Y(p[1], p[0]), Y(p[2], p[0]), Y(p[3], p[0]), Y(p[4], p[0]));
-const m_z = mz(Mk(X(p[1], p[0]), Y(p[1], p[0])), Mk(-X(p[2], p[0]), -Y(p[2], p[0])), Mk(-X(p[3], p[0]), 3 * Y(p[3], p[0])), Mk(X(p[4], p[0]), -3 * Y(p[4], p[0])));
-const M_z = Mz(m_z);
-const C_xa = Cxa(C_x, C_y);
-const C_ya = Cya(C_x, C_y);
-const adh_header = ['Cx, [-]', 'Cy, [-]', 'mz, [-]', 'Cxa, [-]', 'Cya, [-]', 'Mz, [-]']
-render([[C_x], [C_y], [m_z], [C_xa], [C_ya], [M_z]], adh_header, 0)
+const q_inf = po[0] * v[0] * v[0] / 2;
+const pk = pi => (pi - p[0]) / q_inf;
+const X = pk => (pk - p[0]) * param.c / 2;
+const Y = pk => (pk - p[0]) * param.b / 2;
+
+const pk_1 = pk(p[1]);
+const pk_2 = pk(p[2]);
+const pk_3 = pk(p[3]);
+const pk_4 = pk(p[4]);
+
+const X1 = X(p[1]);
+const X2 = X(p[2]);
+const X3 = X(p[3]);
+const X4 = X(p[4]);
+
+const Y1 = Y(p[1]);
+const Y2 = Y(p[2]);
+const Y3 = Y(p[3]);
+const Y4 = Y(p[4]);
+
+const Cx = (X1 + X2 - X3 - X4) / (param.b * q_inf);
+const Cy = (-Y1 + Y2 - Y3 + Y4) / (param.b * q_inf);
+const mz1 = Y1 * (param.b / 4) + X1 * (param.c / 4);
+const mz2 = -Y2 * (param.b / 4) - X2 * (param.c / 4);
+const mz3 = Y3 * (3 * param.b / 4) - X3 * (param.c / 4);
+const mz4 = -Y4 * (3 * param.b / 4) + X4 * (param.c / 4);
+const mz = (mz1 + mz2 + mz3 + mz4) / (q_inf * param.b * param.b);
+const Cya = Cy * math.cos(param.alfa) - Cx * math.sin(param.alfa);
+const Cxa = Cy * math.sin(param.alfa) + Cx * math.cos(param.alfa);
+const K = Cya / Cxa;
+const Cd = - (mz / Cy)
+
+const adh_header = ['Cx, [-]', 'Cy, [-]', 'mz, [-]', 'Cxa, [-]', 'Cya, [-]', 'K, [-]', 'Cd, [-']
+render([[Cx], [Cy], [mz], [Cxa], [Cya], [K], [Cd]], adh_header, 0)
 
 const criticalReynoldsNumber = (Tr, M) => {
     const Tst_otn = param.T_st / Tr; // Относительная температура стенки;
@@ -155,7 +180,6 @@ const criticalReynoldsNumber = (Tr, M) => {
 const reynoldsNumber = (po, V, u) => po * V * param.L / u;
 const Re_l1 = reynoldsNumber(po[1], v[1], u[1]);
 const Re_l2 = reynoldsNumber(po[2], v[2], u[2]);
-console.log(Re_l1, Re_l2);
 
 const Re_kr1 = criticalReynoldsNumber(Tr_laminar[0], M[1]);
 const Re_kr2 = criticalReynoldsNumber(Tr_laminar[1], M[2]);

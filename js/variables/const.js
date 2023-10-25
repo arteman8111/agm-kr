@@ -13,7 +13,6 @@ const c = 80 * math.pow(10,-3) // мм
 const b = 1000 * math.pow(10,-3) // мм 
 const k = 1.4 // адиабата
 const betta_k = math.atan(c/b)
-const q_inf = 3.875 * math.pow(10, 5) // кг/мс^2 || скоростной напор
 const L = math.sqrt(math.pow(b / 2, 2) + math.pow(c / 2, 2)); // Длина грани
 
 
@@ -31,6 +30,5 @@ export {
     b,
     k,
     betta_k,
-    q_inf,
     L
 }

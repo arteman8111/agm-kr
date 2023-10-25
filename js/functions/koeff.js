@@ -4,9 +4,9 @@ const n = 0.76;
 const psi = 0.85;
 
 
-const cp_koeff = (T, Tk) => cp0 * math.pow(T / Tk, fi)
-const u_koeff = (T, Tk) => u0 * math.pow(T / Tk, n)
-const lymbda_koeff = (T, Tk) => lymbda0 * math.pow(T / Tk, psi)
+const cp_koeff = T => cp0 * math.pow(T / 288.15, fi)
+const u_koeff = T => u0 * math.pow(T / 288.15, n)
+const lymbda_koeff = T => lymbda0 * math.pow(T / 261, psi)
 
 export {
     cp_koeff,
