@@ -1,10 +1,5 @@
 import * as param from "../variables/const.js"
 
-const Re = (M) => {
-    let x = (param.T_st - 1) / (M * M)
-    return 1 - 16 * x - 412.5 * math.pow(x, 2) - 35000 * math.pow(x, 3) - 375000 * math.pow(x, 4);
-}
-
 const v_default = (M,a) => {
     return M * a
 }
