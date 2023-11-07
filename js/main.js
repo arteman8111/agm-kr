@@ -55,7 +55,7 @@ const getSloy = (x_kr, inc) => {
         }
     )
     let delta_xk = ps.delta_x(delta_[1], v[inc], po[inc], u[inc]);
-    let b = param.L - x_kr1;
+    let b = param.L - x_kr;
     xarr.push(delta_xk, delta_xk + b / 3, delta_xk + 2 * b / 3, delta_xk + b);
     let xarr3_6 = [delta_xk, delta_xk + b / 3, delta_xk + 2 * b / 3, delta_xk + b]
     xarr3_6.forEach(
@@ -97,7 +97,17 @@ const getSloy = (x_kr, inc) => {
             delta_zv_zv.push(ps.delta_t_zv_zv(delta_ns_zv_zv[i], Cfx[i], Cfx_ns[i]))
         }
     )
-    let xarr2 = [x_kr / 2, x_kr, x_kr, param.L - (param.L - x_kr) / 3, x_kr + (param.L - x_kr) / 3, param.L, 0, param.L / 2, param.L];
+    let xarr2 = [
+        x_kr / 2, 
+        x_kr, 
+        x_kr, 
+        x_kr + (param.L - x_kr) / 3, 
+        x_kr + 2 * (param.L - x_kr) / 3, 
+        param.L,
+        0,
+        param.L / 2,
+        param.L
+    ];
     return [
         xarr2,
         xarr,
