@@ -1,8 +1,12 @@
 .container {
     width: 100%;
-    max-width: 1272px;
+    max-width: 980px;
     margin: 0 auto;
-    padding: 0 50px;
+    padding: 0 10px;
+}
+
+.render {
+    padding: 25px 0;
 }
 
 .render__title {
@@ -23,6 +27,7 @@
 
 .data__element {
     border: 1px solid gray;
+    padding: 0 5px;
 }
 
 .data__element:first-child {
