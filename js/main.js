@@ -7,44 +7,43 @@ import { Cx, Cy, mz, Cxa, Cya, K, Cd } from "./functions/ADH.js";
 import { criticalReynoldsNumber, reynoldsNumber } from "./functions/utils.js";
 import { getSloy } from "./functions/funcPS.js";
 
-// Последний этап АГМ
-const Cfsm = (ps) => {
-    return (ps[11][1] * ps[1][1] + ps[11][5] * ps[1][5] - ps[11][2] * ps[1][2]) / param.L;
-}
-const Cfturb = (ps) => {
-    return (ps[11][8] * ps[1][8] - ps[11][6] * ps[1][6]) / param.L
-}
-
-const Re_l1 = reynoldsNumber(po[1], v[1], u[1]);
-const Re_l2 = reynoldsNumber(po[2], v[2], u[2]);
-const Re_kr1 = criticalReynoldsNumber(Tr_laminar[0], M[1]);
-const Re_kr2 = criticalReynoldsNumber(Tr_laminar[1], M[2]);
-const x_kr1 = Re_kr1 * u[1] / (v[1] * po[1]);
-const x_kr2 = Re_kr2 * u[2] / (v[2] * po[2]);
-const ps13 = getSloy(x_kr1, 1);
-const ps24 = getSloy(x_kr2, 2);
-const Cf1 = Cfsm(ps13);
-const Cf2 = Cfsm(ps24);
-const Cf3 = Cfturb(ps13);
-const Cf4 = Cfturb(ps24);
-
-const q = (po, v) => {
-    return po * v * v / 2;
-}
-
-const newADH = () => {
-    const Cxf = (Cf1 * q(po[1], v[1]) + Cf2 * q(po[2], v[2]) + Cf3 * q(po[3], v[3]) + Cf4 * q(po[4], v[4])) / (2 * q(po[0], v[0]));
-    const Cx_new = Cx + Cxf;
-    const Cya_new = Cy * math.cos(param.alfa) - Cx_new * math.sin(param.alfa);
-    const Cxa_new = Cy * math.sin(param.alfa) + Cx_new * math.cos(param.alfa);
-    const K_new = Cya_new / Cxa_new;
-
-    return [
-        [Cx_new], [Cy], [mz], [Cxa_new], [Cya_new], [K_new], [Cd]
-    ]
-}
-
 function init() {
+    const Cfsm = (ps) => {
+        return (ps[11][1] * ps[1][1] + ps[11][5] * ps[1][5] - ps[11][2] * ps[1][2]) / param.L;
+    }
+    const Cfturb = (ps) => {
+        return (ps[11][8] * ps[1][8] - ps[11][6] * ps[1][6]) / param.L
+    }
+
+    const Re_l1 = reynoldsNumber(po[1], v[1], u[1]);
+    const Re_l2 = reynoldsNumber(po[2], v[2], u[2]);
+    const Re_kr1 = criticalReynoldsNumber(Tr_laminar[0], M[1]);
+    const Re_kr2 = criticalReynoldsNumber(Tr_laminar[1], M[2]);
+    const x_kr1 = Re_kr1 * u[1] / (v[1] * po[1]);
+    const x_kr2 = Re_kr2 * u[2] / (v[2] * po[2]);
+    const ps13 = getSloy(x_kr1, 1);
+    const ps24 = getSloy(x_kr2, 2);
+    const Cf1 = Cfsm(ps13);
+    const Cf2 = Cfsm(ps24);
+    const Cf3 = Cfturb(ps13);
+    const Cf4 = Cfturb(ps24);
+
+    const q = (po, v) => {
+        return po * v * v / 2;
+    }
+
+    const newADH = () => {
+        const Cxf = (Cf1 * q(po[1], v[1]) + Cf2 * q(po[2], v[2]) + Cf3 * q(po[3], v[3]) + Cf4 * q(po[4], v[4])) / (2 * q(po[0], v[0]));
+        const Cx_new = Cx + Cxf;
+        const Cya_new = Cy * math.cos(param.alfa) - Cx_new * math.sin(param.alfa);
+        const Cxa_new = Cy * math.sin(param.alfa) + Cx_new * math.cos(param.alfa);
+        const K_new = Cya_new / Cxa_new;
+
+        return [
+            [Cx_new], [Cy], [mz], [Cxa_new], [Cya_new], [K_new], [Cd]
+        ]
+    }
+
     const app = document.querySelector('#app');
     myId(app);
     render([M, p, T, po, cp, u, lymbda], ['M, [-]', 'p, [Па]', 'T, [K]', 'po, [кг/м3]', 'Cp, [Дж/кг*К]', 'μ, [Па*с]', 'λ, [Вт/м*К]'], 0, 'Параметры в 6 областях')
@@ -61,4 +60,39 @@ function init() {
     render([[Cx], [Cy], [mz], [Cxa], [Cya], [K], [Cd]], ['Cx, [-]', 'Cy, [-]', 'mz, [-]', 'Cxa, [-]', 'Cya, [-]', 'K, [-]', 'Cd, [-]'], 0, 'АДХ')
     render(newADH(), ['Cx, [-]', 'Cy, [-]', 'mz, [-]', 'Cxa, [-]', 'Cya, [-]', 'K, [-]', 'Cd, [-]'], 0, 'АДХ с учетом трения')
 }
-init()
+const exampleModal = document.getElementById('exampleModal');
+const divArea = document.querySelector('.area');
+exampleModal.addEventListener('show.bs.modal', function (event) {
+    // Кнопка, запускающая модальное окно
+    const button = event.relatedTarget
+    const modalBodyInput = exampleModal.querySelector('.modal-body select')
+    const modalFooterButton = exampleModal.querySelector('.modal-footer button')
+    
+    modalFooterButton.addEventListener('click', () => {
+        const value = modalBodyInput.value;
+        button.remove();
+        divArea.remove();
+        N = +value;
+        let c, b;
+let N;
+const cb_get = (N) => {
+    if (N <= 6) {
+        c = 80 * math.pow(10, -3);
+        b = 1000 * math.pow(10, -3);
+    } else if (N <= 12) {
+        c = 90 * math.pow(10, -3);
+        b = 1100 * math.pow(10, -3);
+    } else if (N <= 18) {
+        c = 100 * math.pow(10, -3);
+        b = 1200 * math.pow(10, -3);
+    } else if (N <= 24) {
+        c = 110 * math.pow(10, -3);
+        b = 1300 * math.pow(10, -3);
+    }
+}
+cb_get(N);
+        console.log(N);
+        init();
+    })
+})
+
