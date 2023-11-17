@@ -12,6 +12,14 @@ const ksu = (betta, M) => {
     }
 }
 
+const criticalReynoldsNumber = (Tr, M) => {
+    const Tst_otn = param.T_st / Tr; // Относительная температура стенки;
+    const x = (Tst_otn - 1) / (M * M);
+    const y = 1 - 16 * x - 412.5 * math.pow(x, 2) - 35000 * math.pow(x, 3) - 375000 * math.pow(x, 4);
+    return 5 * math.pow(10, 6) * y
+}
+const reynoldsNumber = (po, V, u, x = param.L) => po * V * x / u;
+
 const rad = (value) => {
     return value * math.pi / 180;
 }
@@ -20,4 +28,4 @@ const grad = (value) => {
     return value * 180 / math.pi
 }
 
-export {v_default,ksu,rad,grad}
+export {v_default,ksu,rad,grad,criticalReynoldsNumber,reynoldsNumber}
