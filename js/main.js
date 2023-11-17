@@ -626,8 +626,12 @@ exampleModal.addEventListener('show.bs.modal', function (event) {
     const button = event.relatedTarget
     modalFooterButton.addEventListener('click', () => {
         const value = modalBodyInput.value;
-        button.remove();
-        divArea.remove();
-        init(value);
+        if (value == 14) {
+            alert("Верни долг владик!")
+        } else {
+            button.remove();
+            divArea.remove();
+            init(value);
+        }
     })
 })
