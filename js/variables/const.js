@@ -1,5 +1,5 @@
 let c, b;
-let N;
+let N = 4;
 const cb_get = (N) => {
     if (N <= 6) {
         c = 80 * math.pow(10, -3);

@@ -60,39 +60,40 @@ function init() {
     render([[Cx], [Cy], [mz], [Cxa], [Cya], [K], [Cd]], ['Cx, [-]', 'Cy, [-]', 'mz, [-]', 'Cxa, [-]', 'Cya, [-]', 'K, [-]', 'Cd, [-]'], 0, 'АДХ')
     render(newADH(), ['Cx, [-]', 'Cy, [-]', 'mz, [-]', 'Cxa, [-]', 'Cya, [-]', 'K, [-]', 'Cd, [-]'], 0, 'АДХ с учетом трения')
 }
-const exampleModal = document.getElementById('exampleModal');
-const divArea = document.querySelector('.area');
-exampleModal.addEventListener('show.bs.modal', function (event) {
-    // Кнопка, запускающая модальное окно
-    const button = event.relatedTarget
-    const modalBodyInput = exampleModal.querySelector('.modal-body select')
-    const modalFooterButton = exampleModal.querySelector('.modal-footer button')
+init()
+// const exampleModal = document.getElementById('exampleModal');
+// const divArea = document.querySelector('.area');
+// exampleModal.addEventListener('show.bs.modal', function (event) {
+//     // Кнопка, запускающая модальное окно
+//     const button = event.relatedTarget
+//     const modalBodyInput = exampleModal.querySelector('.modal-body select')
+//     const modalFooterButton = exampleModal.querySelector('.modal-footer button')
     
-    modalFooterButton.addEventListener('click', () => {
-        const value = modalBodyInput.value;
-        button.remove();
-        divArea.remove();
-        N = +value;
-        let c, b;
-let N;
-const cb_get = (N) => {
-    if (N <= 6) {
-        c = 80 * math.pow(10, -3);
-        b = 1000 * math.pow(10, -3);
-    } else if (N <= 12) {
-        c = 90 * math.pow(10, -3);
-        b = 1100 * math.pow(10, -3);
-    } else if (N <= 18) {
-        c = 100 * math.pow(10, -3);
-        b = 1200 * math.pow(10, -3);
-    } else if (N <= 24) {
-        c = 110 * math.pow(10, -3);
-        b = 1300 * math.pow(10, -3);
-    }
-}
-cb_get(N);
-        console.log(N);
-        init();
-    })
-})
+//     modalFooterButton.addEventListener('click', () => {
+//         const value = modalBodyInput.value;
+//         button.remove();
+//         divArea.remove();
+//         N = +value;
+//         let c, b;
+// let N;
+// const cb_get = (N) => {
+//     if (N <= 6) {
+//         c = 80 * math.pow(10, -3);
+//         b = 1000 * math.pow(10, -3);
+//     } else if (N <= 12) {
+//         c = 90 * math.pow(10, -3);
+//         b = 1100 * math.pow(10, -3);
+//     } else if (N <= 18) {
+//         c = 100 * math.pow(10, -3);
+//         b = 1200 * math.pow(10, -3);
+//     } else if (N <= 24) {
+//         c = 110 * math.pow(10, -3);
+//         b = 1300 * math.pow(10, -3);
+//     }
+// }
+// cb_get(N);
+//         console.log(N);
+//         init();
+//     })
+// })
 
