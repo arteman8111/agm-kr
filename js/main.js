@@ -9,8 +9,10 @@ function init(N) {
         const header = document.createElement('tr')
         const td = (element) => `<td class="data__element">${element}</td>`
         header.insertAdjacentHTML('beforeend', td(''))
-        for (let i = index; i < arr[0].length + index; i++) {
-            header.insertAdjacentHTML('beforeend', td(i))
+        if (index !== 2) {
+            for (let i = index; i < arr[0].length + index; i++) {
+                header.insertAdjacentHTML('beforeend', td(i))
+            }
         }
         for (let i = 0; i < arr.length; i++) {
             const tr = document.createElement('tr');
@@ -327,6 +329,7 @@ function init(N) {
             L / 2,
             L
         ];
+        console.log(xarr2);
         return [
             xarr2,
             xarr,
@@ -522,9 +525,9 @@ function init(N) {
 
     // cp, u, lymbda
     T.forEach(Tk => {
-        cp.push(cp_koeff(Tk, T[0]))
-        u.push((u_koeff(Tk, T[0])))
-        lymbda.push(lymbda_koeff(Tk, T[0]))
+        cp.push(cp_koeff(Tk))
+        u.push((u_koeff(Tk)))
+        lymbda.push(lymbda_koeff(Tk))
     });
 
     // Параметры торможения
@@ -600,19 +603,20 @@ function init(N) {
     // Блок отрисовки таблиц
     const app = document.querySelector('#app');
     myId(app);
-    render([M, p, T, po, cp, u, lymbda], ['M, [-]', 'p, [Па]', 'T, [K]', 'po, [кг/м3]', 'Cp, [Дж/кг*К]', 'μ, [Па*с]', 'λ, [Вт/м*К]'], 0, 'Параметры в 6 областях')
+    render([[M[0]], [p[0]], [T[0]], [po[0]], [a[0]]], ['M, [-]', 'p, [Па]', 'T, [K]', 'po, [кг/м3]', 'a, [м/с]'], 2, 'Параметры атмосферы')
+    render([M, p, T, po, a, cp, u, lymbda], ['M, [-]', 'p, [Па]', 'T, [K]', 'po, [кг/м3]', 'a, [м/с]', 'Cp, [Дж/кг*К]', 'μ, [Па*с]', 'λ, [Вт/м*К]'], 0, 'Параметры в 6 областях, где 0 - набегающий поток')
     render([T0, p0, po0], ['T0, [K]', 'p0, [Па]', 'po, [кг / м3]'], 0, 'Параметры торможения')
     render([thet.map(el => grad(el))], ['θ, [град]'], 1, 'Угол наколна СУ')
     render([um.map(el => grad(el)), betta.map(el => grad(el))], ['μ, [град]', 'β, [град]'], 1, 'Угол наклона маха и поворота потока')
-    render([[delta * 180 / math.pi]], ['delta, [град]'], 6, 'Отклонение от оси в 5-6 областях')
+    render([[delta * 180 / math.pi]], ['delta, [град]'], 2, 'Отклонение от оси в 5-6 областях')
     render([Tr_laminar, T_opr_laminar, Tr_turb, T_opr_turb], ['Tr (л), [K]', 'T* (л), [K]', 'Tr (т), [K]', 'T* (т), [K]'], 1, 'Определяющая температура');
-    render([[Re_kr1, Re_l1], [Re_kr2, Re_l2]], ['Re_кр1 / Re_l1, [-]', 'Re_кр2 / Re_l2, [-]'], 0, 'Критическое / Обычное число Рейнольдса');
-    render([[x_kr1], [x_kr2]], ['Xкр1, [м]', 'Xкр2, [м]'], 0, '1-ая и 2-ая критическая точка в смешанном ПС');
+    render([[Re_kr1, Re_l1], [Re_kr2, Re_l2]], ['Re_кр1 / Re_l1, [-]', 'Re_кр2 / Re_l2, [-]'], 2, 'Критическое / Обычное число Рейнольдса');
+    render([[x_kr1], [x_kr2]], ['Xкр1, [м]', 'Xкр2, [м]'], 2, '1-ая и 2-ая критическая точка в смешанном ПС');
     render(ps13, ['X', 'Xф', 'δн', 'τн', 'Cfxн', 'Cfн', 'δ*н', 'δ**н', 'δ', 'τ', 'Cfx', 'Cf', 'δ*', 'δ**'], 1, 'Параметры ЛПС и ТПС 1 и 3 грани')
     render(ps24, ['X', 'Xф', 'δн', 'τн', 'Cfxн', 'Cfн', 'δ*н', 'δ**н', 'δ', 'τ', 'Cfx', 'Cf', 'δ*', 'δ**'], 1, 'Параметры ЛПС и ТПС 2 и 4 грани')
-    render([[Cf1], [Cf2], [Cf3], [Cf4]], ['1 грань', '2 грань', '3 грань', '4 грань'], 1, "Средние коэфф трения ПС")
-    render([[Cx], [Cy], [mz], [Cxa], [Cya], [K], [Cd]], ['Cx, [-]', 'Cy, [-]', 'mz, [-]', 'Cxa, [-]', 'Cya, [-]', 'K, [-]', 'Cd, [-]'], 0, 'АДХ')
-    render(newADH(), ['Cx, [-]', 'Cy, [-]', 'mz, [-]', 'Cxa, [-]', 'Cya, [-]', 'K, [-]', 'Cd, [-]'], 0, 'АДХ с учетом трения')
+    render([[Cf1], [Cf2], [Cf3], [Cf4]], ['1 грань', '2 грань', '3 грань', '4 грань'], 2, "Средние коэфф трения ПС")
+    render([[Cx], [Cy], [mz], [Cxa], [Cya], [K], [Cd]], ['Cx, [-]', 'Cy, [-]', 'mz, [-]', 'Cxa, [-]', 'Cya, [-]', 'K, [-]', 'Cd, [-]'], 2, 'АДХ')
+    render(newADH(), ['Cx, [-]', 'Cy, [-]', 'mz, [-]', 'Cxa, [-]', 'Cya, [-]', 'K, [-]', 'Cd, [-]'], 2, 'АДХ с учетом трения')
 }
 
 const exampleModal = document.getElementById('exampleModal');
