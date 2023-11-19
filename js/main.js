@@ -47,7 +47,7 @@ function init(N) {
                 </div>
                 <div class="id__box">
                     <dt class="id__item">α, [град]:</dt>
-                    <dd class="id__item">${alfa}</dd>
+                    <dd class="id__item">${grad(alfa)}</dd>
                 </div>
                 <div class="id__box">
                     <dt class="id__item">T, [K]:</dt>
@@ -329,7 +329,6 @@ function init(N) {
             L / 2,
             L
         ];
-        console.log(xarr2);
         return [
             xarr2,
             xarr,
@@ -418,7 +417,7 @@ function init(N) {
     // Определение параметров
     let h = (10 + 0.4 * N) * math.pow(10, 3) // геометрическая высота [м]
     let M_inf = 4.5 + 0.1 * N // число маха для набегающего потока [-]
-    let alfa = 2 + 0.1 * N // угол атаки [град]
+    let alfa = rad(2 + 0.1 * N) // угол атаки [град]
     let T_st = 373 // температура стенки [К]
     let Re_k = 5 * math.pow(10, 6) // критическое число рейнольдса [-]
     let cp0 = 1004.7; // удельная теплоемкость воздуха [Дж/кг/К]
@@ -431,7 +430,7 @@ function init(N) {
     let n = 0.76; // коэффициент [-]
     let psi = 0.85; // коэффициент [-]
     let atmos = atm(h); // инициализация атмосферы
-    let betta = [betta_k - rad(alfa), betta_k + rad(alfa), betta_k, betta_k]; // массив углов поворота
+    let betta = [betta_k - alfa, betta_k + alfa, betta_k, betta_k]; // массив углов поворота
     let thet = [secantMethod(ksu(betta[0], M_inf), rad(12)), secantMethod(ksu(betta[1], M_inf), rad(12))]; // массив СУ
     let M = [M_inf]; // мах
     let p = [atmos.p]; // давление 
@@ -554,8 +553,8 @@ function init(N) {
     const mz3 = Y3 * (3 * b / 4) - X3 * (c / 4);
     const mz4 = -Y4 * (3 * b / 4) + X4 * (c / 4);
     const mz = (mz1 + mz2 + mz3 + mz4) / (q_inf * b * b);
-    const Cya = Cy * math.cos(alfa) - Cx * math.sin(alfa);
     const Cxa = Cy * math.sin(alfa) + Cx * math.cos(alfa);
+    const Cya = Cy * math.cos(alfa) - Cx * math.sin(alfa);
     const K = Cya / Cxa;
     const Cd = - (mz / Cy)
 
