@@ -595,7 +595,7 @@ function init(N) {
         const K_new = Cya_new / Cxa_new;
 
         return [
-            [Cx_new], [Cy], [mz], [Cxa_new], [Cya_new], [K_new], [Cd]
+            [Cx_new], [Cxa_new], [Cya_new], [K_new]
         ]
     }
 
@@ -615,7 +615,7 @@ function init(N) {
     render(ps24, ['X', 'Xф', 'δн', 'τн', 'Cfxн', 'Cfн', 'δ*н', 'δ**н', 'δ', 'τ', 'Cfx', 'Cf', 'δ*', 'δ**'], 1, 'Параметры ЛПС и ТПС 2 и 4 грани')
     render([[Cf1], [Cf2], [Cf3], [Cf4]], ['1 грань', '2 грань', '3 грань', '4 грань'], 2, "Средние коэфф трения ПС")
     render([[Cx], [Cy], [mz], [Cxa], [Cya], [K], [Cd]], ['Cx, [-]', 'Cy, [-]', 'mz, [-]', 'Cxa, [-]', 'Cya, [-]', 'K, [-]', 'Cd, [-]'], 2, 'АДХ')
-    render(newADH(), ['Cx, [-]', 'Cy, [-]', 'mz, [-]', 'Cxa, [-]', 'Cya, [-]', 'K, [-]', 'Cd, [-]'], 2, 'АДХ с учетом трения')
+    render(newADH(), ['Cx, [-]','Cxa, [-]', 'Cya, [-]', 'K, [-]'], 2, 'АДХ с учетом трения')
 }
 
 const exampleModal = document.getElementById('exampleModal');
