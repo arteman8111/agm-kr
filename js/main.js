@@ -1,4 +1,4 @@
-function init(N) {
+function init(N, group) {
     // Блок отрисовки
     const render = (arr, label, index, title1 = `Заголовок`) => {
         const title = `<h2 style="margin: 25px 0 0 0; font-size: 24px; padding:10px 5px; ">${title1}</h3>`
@@ -31,7 +31,7 @@ function init(N) {
             <dl class="id__list">
                 <div class="id__box">
                     <dt class="id__item">Группа:</dt>
-                    <dd class="id__item">СМ3-72</dd>
+                    <dd class="id__item">СМ3-7${group}</dd>
                 </div>
                 <div class="id__box">
                     <dt class="id__item">Вариант N:</dt>
@@ -413,12 +413,23 @@ function init(N) {
         }
     }
     cb_get(N);
+    let h, M_inf, T_st
+
+    const group_get = (groupN) => {
+        if (groupN === 2){
+            h = (10 + 0.4 * N) * math.pow(10, 3) // геометрическая высота [м]
+            M_inf = 4.5 + 0.1 * N // число маха для набегающего потока [-]
+            T_st = 373 // температура стенки [К]
+        } else if (groupN === 1) {
+            h = (10 + 0.5 * N) * math.pow(10, 3) // геометрическая высота [м]
+            M_inf = 4 + 0.15 * N // число маха для набегающего потока [-]
+            T_st = 405 // температура стенки [К]
+        }
+    }
+    group_get(group)
 
     // Определение параметров
-    let h = (10 + 0.4 * N) * math.pow(10, 3) // геометрическая высота [м]
-    let M_inf = 4.5 + 0.1 * N // число маха для набегающего потока [-]
     let alfa = rad(2 + 0.1 * N) // угол атаки [град]
-    let T_st = 373 // температура стенки [К]
     let Re_k = 5 * math.pow(10, 6) // критическое число рейнольдса [-]
     let cp0 = 1004.7; // удельная теплоемкость воздуха [Дж/кг/К]
     let u0 = 1.79 * math.pow(10, -5); // динамическая вязкость [Па*с]
@@ -623,14 +634,16 @@ const app = document.querySelector('#app')
 exampleModal.addEventListener('show.bs.modal', function (event) {
     event.stopPropagation();
     const divArea = document.querySelector('.area');
-    const modalBodyInput = this.querySelector('.modal-body select')
+    const modalBodyInput = this.querySelector('#group-number')
+    const modalBodyInputGroup = this.querySelector('#group')
     const modalFooterButton = this.querySelector('.modal-footer button')
     // Кнопка, запускающая модальное окно
     const button = event.relatedTarget
     modalFooterButton.addEventListener('click', () => {
-        const value = modalBodyInput.value;
+        const value = +modalBodyInput.value;
+        const group = +modalBodyInputGroup.value;
         button.remove();
         divArea.remove();
-        init(value);
+        init(value, group);
     })
 })
