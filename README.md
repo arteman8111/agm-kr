@@ -1,5 +1,5 @@
 <h1 align="center">Hi there, I'm <a href="https://t.me/artemasdemas" target="_blank">ARTEM DEMCHENKO</a> 
-<p align="center">Computer science student from BMSTU [Moscow Bauman Tehnical University], Fullstack developer <img src="flag-for-russia.svg" width="25" height="25"></p>
+<p align="center">Computer science student from BMSTU [Moscow Bauman Tehnical University], Fullstack developer</p>
 
 ## Course work on the course "Aerohydromechanics"
 
