@@ -133,115 +133,56 @@ function init(N, group) {
 
     // Расчет параметров ПС 1-4 грани
     const getSloy = (x_kr, inc) => {
-        let xarr = [x_kr / 2, x_kr];
-        let delta_ns = [];
-        let tau_ns = [];
-        let Cfx_ns = [];
-        let Cf_ns = [];
-        let delta_ns_zv = [];
-        let delta_ns_zv_zv = [];
-        let delta_ = [];
-        let tau = [];
-        let Cfx = [];
-        let Cf = [];
-        let delta_zv = [];
-        let delta_zv_zv = [];
-
-        xarr.forEach(
-            (x, i) => {
-                const Re = Rek(v[inc], po[inc], x, u[inc]);
-                delta_ns.push(delta_l_ns(x, Re));
-                tau_ns.push(tau_l_ns(po[inc], v[inc], Re));
-                Cfx_ns.push(Cfx_l_ns(Re));
-                Cf_ns.push(Cf_l_ns(Re));
-                delta_ns_zv.push(delta_l_ns_zv(Re, x));
-                delta_ns_zv_zv.push(delta_l_ns_zv_zv(Re, x));
-
-                delta_.push(delta_l(delta_ns[i], T_opr_laminar[inc - 1], T[inc]));
-                tau.push(tau_l(tau_ns[i], T_opr_laminar[inc - 1], T[inc]));
-                Cfx.push(Cfx_l(Cfx_ns[i], T_opr_laminar[inc - 1], T[inc]));
-                Cf.push(Cf_l(Cf_ns[i], T_opr_laminar[inc - 1], T[inc]));
-                delta_zv.push(delta_l_zv(delta_ns_zv[i], delta_[i], delta_ns[i]));
-                delta_zv_zv.push(delta_l_zv_zv(delta_ns_zv_zv[i], Cfx[i], Cfx_ns[i]))
-            }
-        )
-        let po_zv = po[inc] * T[inc] / T_opr_laminar[inc - 1];
-        let u_zv = u_koeff(T_opr_laminar[inc - 1]);
-        let x_kr1 = criticalReynoldsNumber(Tr_laminar[inc - 1], M[inc]) * u[inc] / (po[inc] * v[inc]);
-        let Re_krit = po_zv * v[inc] * x_kr1 / u_zv;
-        let delta_xk = math.pow((4.64 * x_kr1 * math.pow(po_zv * v[inc] / u_zv, 0.2)) / (math.sqrt(Re_krit) * 0.37), 1.25)
-        let b = L - x_kr;
-        xarr.push(delta_xk, delta_xk + b / 3, delta_xk + 2 * b / 3, delta_xk + b);
-        let xarr3_6 = [delta_xk, delta_xk + b / 3, delta_xk + 2 * b / 3, delta_xk + b]
-        xarr3_6.forEach(
-            (x, i) => {
-                const Re = Rek(v[inc], po[inc], x, u[inc]);
-                delta_ns.push(delta_t_ns(x, Re));
-                tau_ns.push(tau_t_ns(po[inc], v[inc], Re));
-                Cfx_ns.push(Cfx_t_ns(Re));
-                Cf_ns.push(Cf_t_ns(Re));
-                delta_ns_zv.push(delta_t_ns_zv(delta_ns[i + 2]));
-                delta_ns_zv_zv.push(delta_t_ns_zv_zv(delta_ns[i + 2]));
-
-                delta_.push(delta_t(delta_ns[i + 2], T_opr_turb[inc - 1], T[inc]));
-                tau.push(tau_t(tau_ns[i + 2], T_opr_turb[inc - 1], T[inc]));
-                Cfx.push(Cfx_t(Cfx_ns[i + 2], T_opr_turb[inc - 1], T[inc]));
-                Cf.push(Cf_t(Cf_ns[i + 2], T_opr_turb[inc - 1], T[inc]));
-                delta_zv.push(delta_t_zv(delta_ns_zv[i + 2], delta_[i + 2], delta_ns[i + 2]));
-                delta_zv_zv.push(delta_t_zv_zv(delta_ns_zv_zv[i + 2], Cfx[i + 2], Cfx_ns[i + 2]))
-            }
-        )
-        let po_zv_T = po[inc + 2] * T[inc + 2] / T_opr_turb[inc + 1];
-        let u_zv_T = u_koeff(T_opr_turb[inc + 1]);
-        let delta_xk2 = math.pow(math.pow(delta_[5], 5) * po_zv_T * v[inc + 2] / (u_zv_T * math.pow(0.37, 5)), 1 / 4);
-        xarr.push(delta_xk2, L / 2 + delta_xk2, L + delta_xk2);
-        let xarr7_9 = [delta_xk2, L / 2 + delta_xk2, L + delta_xk2];
-        xarr7_9.forEach(
-            (x, i) => {
-                const Re = Rek(v[inc + 2], po[inc + 2], x, u[inc + 2]);
-                delta_ns.push(delta_t_ns(x, Re));
-                tau_ns.push(tau_t_ns(po[inc + 2], v[inc + 2], Re));
-                Cfx_ns.push(Cfx_t_ns(Re));
-                Cf_ns.push(Cf_t_ns(Re));
-                delta_ns_zv.push(delta_t_ns_zv(delta_ns[i + 6]));
-                delta_ns_zv_zv.push(delta_t_ns_zv_zv(delta_ns[i + 6]));
-
-                delta_.push(delta_t(delta_ns[i + 6], T_opr_turb[inc + 1], T[inc + 2]));
-                tau.push(tau_t(tau_ns[i + 6], T_opr_turb[inc + 1], T[inc + 2]));
-                Cfx.push(Cfx_t(Cfx_ns[i + 6], T_opr_turb[inc + 1], T[inc + 2]));
-                Cf.push(Cf_t(Cf_ns[i + 6], T_opr_turb[inc + 1], T[inc + 2]));
-                delta_zv.push(delta_t_zv(delta_ns_zv[i + 6], delta_[i + 6], delta_ns[i + 6]));
-                delta_zv_zv.push(delta_t_zv_zv(delta_ns_zv_zv[i + 6], Cfx[i + 6], Cfx_ns[i + 6]))
-            }
-        )
-        let xarr2 = [
-            x_kr / 2,
-            x_kr,
-            x_kr,
-            x_kr + (L - x_kr) / 3,
-            x_kr + 2 * (L - x_kr) / 3,
-            L,
-            0,
-            L / 2,
-            L
+        const xarr = [x_kr / 2, x_kr];
+        const results = {
+            delta_ns: [], tau_ns: [], Cfx_ns: [], Cf_ns: [], delta_ns_zv: [], delta_ns_zv_zv: [],
+            delta_: [], tau: [], Cfx: [], Cf: [], delta_zv: [], delta_zv_zv: []
+        };
+    
+        const computeValues = (x, inc, idxOffset = 0, isTurb = false) => {
+            const Re = Rek(v[inc], po[inc], x, u[inc]);
+            const deltaFunc = isTurb ? delta_t_ns : delta_l_ns;
+            const tauFunc = isTurb ? tau_t_ns : tau_l_ns;
+            const CfxFunc = isTurb ? Cfx_t_ns : Cfx_l_ns;
+            const CfFunc = isTurb ? Cf_t_ns : Cf_l_ns;
+            const delta_zv_Func = isTurb ? delta_t_ns_zv : delta_l_ns_zv;
+            const delta_zv_zv_Func = isTurb ? delta_t_ns_zv_zv : delta_l_ns_zv_zv;
+            const T_opr = isTurb ? T_opr_turb[inc - 1] : T_opr_laminar[inc - 1];
+            results.delta_ns.push(deltaFunc(x, Re));
+            results.tau_ns.push(tauFunc(po[inc], v[inc], Re));
+            results.Cfx_ns.push(CfxFunc(Re));
+            results.Cf_ns.push(CfFunc(Re));
+            results.delta_ns_zv.push(delta_zv_Func(results.delta_ns[idxOffset]));
+            results.delta_ns_zv_zv.push(delta_zv_zv_Func(results.delta_ns[idxOffset]));
+            results.delta_.push(delta_t(results.delta_ns[idxOffset], T_opr, T[inc]));
+            results.tau.push(tau_t(results.tau_ns[idxOffset], T_opr, T[inc]));
+            results.Cfx.push(Cfx_t(results.Cfx_ns[idxOffset], T_opr, T[inc]));
+            results.Cf.push(Cf_t(results.Cf_ns[idxOffset], T_opr, T[inc]));
+            results.delta_zv.push(delta_t_zv(results.delta_ns_zv[idxOffset], results.delta_[idxOffset], results.delta_ns[idxOffset]));
+            results.delta_zv_zv.push(delta_t_zv_zv(results.delta_ns_zv_zv[idxOffset], results.Cfx[idxOffset], results.Cfx_ns[idxOffset]));
+        };
+    
+        xarr.forEach((x, i) => computeValues(x, inc, i));
+        const po_zv = po[inc] * T[inc] / T_opr_laminar[inc - 1];
+        const u_zv = u_koeff(T_opr_laminar[inc - 1]);
+        const x_kr1 = criticalReynoldsNumber(Tr_laminar[inc - 1], M[inc]) * u[inc] / (po[inc] * v[inc]);
+        const Re_krit = po_zv * v[inc] * x_kr1 / u_zv;
+        const delta_xk = Math.pow((4.64 * x_kr1 * Math.pow(po_zv * v[inc] / u_zv, 0.2)) / (Math.sqrt(Re_krit) * 0.37), 1.25);
+        const xarr3_6 = [delta_xk, delta_xk + (L - x_kr) / 3, delta_xk + 2 * (L - x_kr) / 3, delta_xk + (L - x_kr)];
+        xarr3_6.forEach((x, i) => computeValues(x, inc, i + 2, true));
+        const po_zv_T = po[inc + 2] * T[inc + 2] / T_opr_turb[inc + 1];
+        const u_zv_T = u_koeff(T_opr_turb[inc + 1]);
+        const delta_xk2 = Math.pow(Math.pow(results.delta_[5], 5) * po_zv_T * v[inc + 2] / (u_zv_T * Math.pow(0.37, 5)), 1 / 4);
+        const xarr7_9 = [delta_xk2, L / 2 + delta_xk2, L + delta_xk2];
+        xarr7_9.forEach((x, i) => computeValues(x, inc + 2, i + 6, true));
+    
+        const xarr2 = [
+            x_kr / 2, x_kr, x_kr, x_kr + (L - x_kr) / 3, x_kr + 2 * (L - x_kr) / 3, L, 0, L / 2, L
         ];
-        return [
-            xarr2,
-            xarr,
-            delta_ns,
-            tau_ns,
-            Cfx_ns,
-            Cf_ns,
-            delta_ns_zv,
-            delta_ns_zv_zv,
-            delta_,
-            tau,
-            Cfx,
-            Cf,
-            delta_zv,
-            delta_zv_zv
-        ]
-    }
+    
+        return [xarr2, [...xarr, ...xarr3_6, ...xarr7_9], ...Object.values(results)];
+    };
+    
 
     // Сила продольная и нормальная
     const X = pk => (pk - p[0]) * c / 2;
