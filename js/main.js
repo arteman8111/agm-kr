@@ -1,99 +1,8 @@
+import { InfoDisplay, Renderer } from "./render.js"
+import { rad, grad, secantMethod } from "./utils.js";
+import { Atmosphere4401 } from "./atmos.js";
+
 function init(N, group) {
-    // Блок отрисовки
-    const render = (arr, label, index, title1 = `Заголовок`) => {
-        const title = `<h2 style="margin: 25px 0 0 0; font-size: 24px; padding:10px 5px; ">${title1}</h3>`
-        const app = document.querySelector('#app')
-        const box = document.createElement('div')
-        const table = document.createElement('table')
-        table.className = "data"
-        const header = document.createElement('tr')
-        const td = (element) => `<td class="data__element">${element}</td>`
-        header.insertAdjacentHTML('beforeend', td(''))
-        if (index !== 2) {
-            for (let i = index; i < arr[0].length + index; i++) {
-                header.insertAdjacentHTML('beforeend', td(i))
-            }
-        }
-        for (let i = 0; i < arr.length; i++) {
-            const tr = document.createElement('tr');
-            tr.insertAdjacentHTML('beforeend', td(label[i]))
-            arr[i].forEach(element => tr.insertAdjacentHTML('beforeend', td(math.format(element, { notation: 'exponential', precision: 5 }))))
-            table.insertAdjacentElement('beforeend', tr)
-        }
-        table.insertAdjacentElement('afterbegin', header)
-        box.insertAdjacentHTML('beforeend', title)
-        box.insertAdjacentElement('beforeend', table)
-        app.insertAdjacentElement('beforeend', box)
-    }
-    const myId = (app) => {
-        app.insertAdjacentHTML('afterbegin', `<section class="id">
-            <h2 class="id__title">Мои ИД:</h2>
-            <dl class="id__list">
-                <div class="id__box">
-                    <dt class="id__item">Группа:</dt>
-                    <dd class="id__item">СМ3-7${group}</dd>
-                </div>
-                <div class="id__box">
-                    <dt class="id__item">Вариант N:</dt>
-                    <dd class="id__item">${N}</dd>
-                </div>
-                <div class="id__box">
-                    <dt class="id__item">h, [м]:</dt>
-                    <dd class="id__item">${h}</dd>
-                </div>
-                <div class="id__box">
-                    <dt class="id__item">M, [-]:</dt>
-                    <dd class="id__item">${M_inf}</dd>
-                </div>
-                <div class="id__box">
-                    <dt class="id__item">α, [град]:</dt>
-                    <dd class="id__item">${grad(alfa)}</dd>
-                </div>
-                <div class="id__box">
-                    <dt class="id__item">T, [K]:</dt>
-                    <dd class="id__item">${T_st}</dd>
-                </div>
-                <div class="id__box">
-                    <dt class="id__item">Reкр, [-]:</dt>
-                    <dd class="id__item">${Re_k}</dd>
-                </div>
-                <div class="id__box">
-                    <dt class="id__item">с, [м]:</dt>
-                    <dd class="id__item">${c}</dd>
-                </div>
-                <div class="id__box">
-                    <dt class="id__item">b, [м]:</dt>
-                    <dd class="id__item">${b}</dd>
-                </div>
-            </dl>
-            </section>`)
-    }
-
-    //  Метод секущих для решения нелинейных уравнений
-    const secantMethod = (f, init) => {
-        let x0 = init;
-
-        const delta = 0.0001;
-        const f_toch = (f(x0) - f(x0 - delta)) / delta;
-        const x1 = x0 - f(x0) / f_toch;
-        const error = 0.0001;
-
-
-        let x_prev = x0;
-        let x_iter = x1;
-        let x_next = -1;
-        let b = 0;
-        function calc(x_prev, x_iter) {
-            return (x_iter - x_prev) * f(x_iter) / (f(x_iter) - f(x_prev))
-        }
-        while (math.abs(x_next - b) > error) {
-            x_next = x_iter - calc(x_prev, x_iter);
-            b = x_iter;
-            x_prev = x_iter;
-            x_iter = x_next;
-        }
-        return x_next
-    }
 
     // Скорость v
     const v_default = (M, a) => {
@@ -119,14 +28,6 @@ function init(N, group) {
 
     // Число рейнольдса
     const reynoldsNumber = (po, V, u, x = L) => po * V * x / u;
-
-    // Утилита
-    const rad = (value) => {
-        return value * math.pi / 180;
-    }
-    const grad = (value) => {
-        return value * 180 / math.pi
-    }
 
     // w
     const w = (M) => math.sqrt((k + 1) / (k - 1)) * math.atan(math.sqrt((M * M - 1) * (k - 1) / (k + 1))) - math.atan(math.sqrt(M * M - 1))
@@ -347,51 +248,6 @@ function init(N, group) {
         ]
     }
 
-    // Определение параметров набегающего потока через ГОСТ 4401-81
-    const atm = (h) => {
-        const r = 6356767;
-        const gc = 9.80665;
-        const x = 1.4;
-        const R = 287.05287;
-        const H = r * h / (r + h);
-        let bm, Tm, Hm, pm;
-
-        if (h < -2000) {
-            return
-        }
-        if (h < 0) {
-            bm = -0.0065; Tm = 301.15; Hm = -2000; pm = 127774;
-        } else if (h < 11000) {
-            bm = -0.0065; Tm = 288.15; Hm = 0; pm = 101325;
-        } else if (h < 20000) {
-            bm = 0; Tm = 216.65; Hm = 11000; pm = 22632;
-        } else if (h < 32000) {
-            bm = 0.001; Tm = 216.65; Hm = 20000; pm = 5474.87;
-        } else if (h < 47000) {
-            bm = 0.0028; Tm = 228.65; Hm = 32000; pm = 868.014;
-        } else if (h < 51000) {
-            bm = 0; Tm = 270.65; Hm = 47000; pm = 110.906;
-        } else if (h < 71000) {
-            bm = -0.0028; Tm = 270.65; Hm = 51000; pm = 66.9384;
-        } else if (h < 85000) {
-            bm = -0.002; Tm = 214.65; Hm = 71000; pm = 3.95639;
-        }
-
-        const T = Tm + bm * (H - Hm);
-        const p = bm ? pm * math.exp(-gc * math.log(T / Tm) / (bm * R)) : pm * math.exp(-gc * (H - Hm) / (R * T));
-        const po = p / (R * T);
-        const a = math.sqrt(x * R * T);
-        const g = gc * math.pow(r / (r + h), 2);
-        return {
-            T,
-            p,
-            po,
-            a,
-            g,
-            H
-        }
-    }
-
     // Сила продольная и нормальная
     const X = pk => (pk - p[0]) * c / 2;
     const Y = pk => (pk - p[0]) * b / 2;
@@ -440,7 +296,7 @@ function init(N, group) {
     let fi = 0.1; // коэффициент [-]
     let n = 0.76; // коэффициент [-]
     let psi = 0.85; // коэффициент [-]
-    let atmos = atm(h); // инициализация атмосферы
+    let atmos = new Atmosphere4401(h); // инициализация атмосферы
     let betta = [betta_k - alfa, betta_k + alfa, betta_k, betta_k]; // массив углов поворота
     let thet = [secantMethod(ksu(betta[0], M_inf), rad(12)), secantMethod(ksu(betta[1], M_inf), rad(12))]; // массив СУ
     let M = [M_inf]; // мах
@@ -611,22 +467,23 @@ function init(N, group) {
     }
 
     // Блок отрисовки таблиц
-    const app = document.querySelector('#app');
-    myId(app);
-    render([[M[0]], [p[0]], [T[0]], [po[0]], [a[0]]], ['M, [-]', 'p, [Па]', 'T, [K]', 'po, [кг/м3]', 'a, [м/с]'], 2, 'Параметры атмосферы')
-    render([M, p, T, po, a, cp, u, lymbda], ['M, [-]', 'p, [Па]', 'T, [K]', 'po, [кг/м3]', 'a, [м/с]', 'Cp, [Дж/кг*К]', 'μ, [Па*с]', 'λ, [Вт/м*К]'], 0, 'Параметры в 6 областях, где 0 - набегающий поток')
-    render([T0, p0, po0], ['T0, [K]', 'p0, [Па]', 'po, [кг / м3]'], 0, 'Параметры торможения')
-    render([thet.map(el => grad(el))], ['θ, [град]'], 1, 'Угол наколна СУ')
-    render([um.map(el => grad(el)), betta.map(el => grad(el))], ['μ, [град]', 'β, [град]'], 1, 'Угол наклона маха и поворота потока')
-    render([[delta * 180 / math.pi]], ['delta, [град]'], 2, 'Отклонение от оси в 5-6 областях')
-    render([Tr_laminar, T_opr_laminar, Tr_turb, T_opr_turb], ['Tr (л), [K]', 'T* (л), [K]', 'Tr (т), [K]', 'T* (т), [K]'], 1, 'Определяющая температура');
-    render([[Re_kr1, Re_l1], [Re_kr2, Re_l2]], ['Re_кр1 / Re_l1, [-]', 'Re_кр2 / Re_l2, [-]'], 2, 'Критическое / Обычное число Рейнольдса');
-    render([[x_kr1], [x_kr2]], ['Xкр1, [м]', 'Xкр2, [м]'], 2, '1-ая и 2-ая критическая точка в смешанном ПС');
-    render(ps13, ['X', 'Xф', 'δн', 'τн', 'Cfxн', 'Cfн', 'δ*н', 'δ**н', 'δ', 'τ', 'Cfx', 'Cf', 'δ*', 'δ**'], 1, 'Параметры ЛПС и ТПС 1 и 3 грани')
-    render(ps24, ['X', 'Xф', 'δн', 'τн', 'Cfxн', 'Cfн', 'δ*н', 'δ**н', 'δ', 'τ', 'Cfx', 'Cf', 'δ*', 'δ**'], 1, 'Параметры ЛПС и ТПС 2 и 4 грани')
-    render([[Cf1], [Cf2], [Cf3], [Cf4]], ['1 грань', '2 грань', '3 грань', '4 грань'], 2, "Средние коэфф трения ПС")
-    render([[Cx], [Cy], [mz], [Cxa], [Cya], [K], [Cd]], ['Cx, [-]', 'Cy, [-]', 'mz, [-]', 'Cxa, [-]', 'Cya, [-]', 'K, [-]', 'Cd, [-]'], 2, 'АДХ')
-    render(newADH(), ['Cx, [-]', 'Cxa, [-]', 'Cya, [-]', 'K, [-]'], 2, 'АДХ с учетом трения')
+    const getIdTable = new InfoDisplay('#app');
+    const getResultTable = new Renderer('#app');
+    getIdTable.render(group, N, h, M_inf, alfa, T_st, Re_k, c, b);
+    getResultTable.render([[M[0]], [p[0]], [T[0]], [po[0]], [a[0]]], ['M, [-]', 'p, [Па]', 'T, [K]', 'po, [кг/м3]', 'a, [м/с]'], 2, 'Параметры атмосферы')
+    getResultTable.render([M, p, T, po, a, cp, u, lymbda], ['M, [-]', 'p, [Па]', 'T, [K]', 'po, [кг/м3]', 'a, [м/с]', 'Cp, [Дж/кг*К]', 'μ, [Па*с]', 'λ, [Вт/м*К]'], 0, 'Параметры в 6 областях, где 0 - набегающий поток')
+    getResultTable.render([T0, p0, po0], ['T0, [K]', 'p0, [Па]', 'po, [кг / м3]'], 0, 'Параметры торможения')
+    getResultTable.render([thet.map(el => grad(el))], ['θ, [град]'], 1, 'Угол наколна СУ')
+    getResultTable.render([um.map(el => grad(el)), betta.map(el => grad(el))], ['μ, [град]', 'β, [град]'], 1, 'Угол наклона маха и поворота потока')
+    getResultTable.render([[delta * 180 / math.pi]], ['delta, [град]'], 2, 'Отклонение от оси в 5-6 областях')
+    getResultTable.render([Tr_laminar, T_opr_laminar, Tr_turb, T_opr_turb], ['Tr (л), [K]', 'T* (л), [K]', 'Tr (т), [K]', 'T* (т), [K]'], 1, 'Определяющая температура');
+    getResultTable.render([[Re_kr1, Re_l1], [Re_kr2, Re_l2]], ['Re_кр1 / Re_l1, [-]', 'Re_кр2 / Re_l2, [-]'], 2, 'Критическое / Обычное число Рейнольдса');
+    getResultTable.render([[x_kr1], [x_kr2]], ['Xкр1, [м]', 'Xкр2, [м]'], 2, '1-ая и 2-ая критическая точка в смешанном ПС');
+    getResultTable.render(ps13, ['X', 'Xф', 'δн', 'τн', 'Cfxн', 'Cfн', 'δ*н', 'δ**н', 'δ', 'τ', 'Cfx', 'Cf', 'δ*', 'δ**'], 1, 'Параметры ЛПС и ТПС 1 и 3 грани')
+    getResultTable.render(ps24, ['X', 'Xф', 'δн', 'τн', 'Cfxн', 'Cfн', 'δ*н', 'δ**н', 'δ', 'τ', 'Cfx', 'Cf', 'δ*', 'δ**'], 1, 'Параметры ЛПС и ТПС 2 и 4 грани')
+    getResultTable.render([[Cf1], [Cf2], [Cf3], [Cf4]], ['1 грань', '2 грань', '3 грань', '4 грань'], 2, "Средние коэфф трения ПС")
+    getResultTable.render([[Cx], [Cy], [mz], [Cxa], [Cya], [K], [Cd]], ['Cx, [-]', 'Cy, [-]', 'mz, [-]', 'Cxa, [-]', 'Cya, [-]', 'K, [-]', 'Cd, [-]'], 2, 'АДХ')
+    getResultTable.render(newADH(), ['Cx, [-]', 'Cxa, [-]', 'Cya, [-]', 'K, [-]'], 2, 'АДХ с учетом трения')
 }
 
 const exampleModal = document.getElementById('exampleModal');
