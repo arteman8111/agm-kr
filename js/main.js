@@ -5,9 +5,7 @@ import { Atmosphere4401 } from "./atmos.js";
 function init(N, group) {
 
     // Скорость v
-    const v_default = (M, a) => {
-        return M * a
-    }
+    const v_default = (M, a) => M * a
 
     // Соотношение для теории косого скачка уплотнения
     const ksu = (betta, M) => {
@@ -109,32 +107,29 @@ function init(N, group) {
 
     // Расчет определяющей температуры и температуры восстановления 1-4 грани
     const getOprTemp = (flow, T, M) => {
-        const Cp_opr = T => 1004.7 * math.pow(T / 288.15, 0.1);
-        const u_opr = T => 1.79 * math.pow(10, -5) * math.pow(T / 288.15, 0.76);
-        const lymbda_opr = T => 0.0232 * math.pow(T / 261, 0.86);
-
-        const r_opr = (Cp, u, lymbda, extent) => math.pow(Cp * u / lymbda, extent);
+        const Cp_opr = T => 1004.7 * Math.pow(T / 288.15, 0.1);
+        const u_opr = T => 1.79e-5 * Math.pow(T / 288.15, 0.76);
+        const lymbda_opr = T => 0.0232 * Math.pow(T / 261, 0.86);
+    
+        const r_opr = (Cp, u, lymbda, extent) => Math.pow(Cp * u / lymbda, extent);
         const Tr_opr = (T, r, M) => T * (1 + r * (k - 1) * M * M / 2);
-        const T_opr = (Tr, T) => (T_st + T) / 2 + 0.22 * (Tr - T)
+        const T_opr = (Tr, T) => (T_st + T) / 2 + 0.22 * (Tr - T);
+    
         let T_z = (T_st + T) / 2;
-        let T_z_previous = 0;
-        let Tr = 0;
-        let rl = 0.83;
-        let rt = 0.88;
-        let r = rl;
-        let extent = 1 / 2;
-        if (flow === 'turb') {
-            r = rt;
-            extent = 1 / 3;
-        }
-        while (math.abs(T_z - T_z_previous) > (T_z * 0.01)) {
+        let T_z_previous;
+        const r_init = flow === 'turb' ? 0.88 : 0.83;
+        const extent = flow === 'turb' ? 1 / 3 : 1 / 2;
+    
+        while (Math.abs(T_z - (T_z_previous ?? 0)) > (T_z * 0.01)) {
             T_z_previous = T_z;
-            Tr = Tr_opr(T, r, M);
+            const Tr = Tr_opr(T, r_init, M);
             T_z = T_opr(Tr, T);
-            r = r_opr(Cp_opr(T_z), u_opr(T_z), lymbda_opr(T_z), extent);
+            r_init = r_opr(Cp_opr(T_z), u_opr(T_z), lymbda_opr(T_z), extent);
         }
-        return [T_z, Tr]
+    
+        return [T_z, Tr_opr(T, r_init, M)];
     }
+    
 
     // Расчет параметров ПС 1-4 грани
     const getSloy = (x_kr, inc) => {
