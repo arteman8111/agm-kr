@@ -41,11 +41,25 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Введите номер варианта</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Введите параметры ромба <></h5>
                     </div>
                     <div class="modal-body">
                         <form>
                             <div class="mb-3">
+                                <label for="T_st" class="col-form-label">Введите температуру стенки Tst [К]:</label>
+                                <input value="373" class="form-control" type="number" id="T_st" placeholder="373 [K]">
+                                <label for="alfa" class="col-form-label">Введите угол атаки alfa [град]:</label>
+                                <input value="3" class="form-control" type="number" id="alfa" placeholder="3 [град]">
+                                <label class="form-label">Введите геометрические параметры c и b:</label>
+                                <div style="display: flex; gap: 5px;">
+                                    <input value="80" class="form-control" type="number" id="c" placeholder="c [мм]">
+                                    <input value="1000" class="form-control" type="number" id="b" placeholder="b [мм]">
+                                </div>
+                                <label class="form-label">Введите геометрическую высоту h [м] и число Маха(набегающего потока) M_inf[-]:</label>
+                                <div style="display: flex; gap: 5px;">
+                                    <input value="11500" class="form-control" type="number" id="h" placeholder="h [м]">
+                                    <input value="4.1" class="form-control" type="number" id="M_inf" placeholder="M_inf [-]">
+                                </div>
                                 <label for="group" class="col-form-label">Номер группы</label>
                                 СМ3-7
                                 <select class="form-control" id="group">

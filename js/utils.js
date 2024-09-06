@@ -11,9 +11,8 @@ export const secantMethod = (f, x0, tolerance = 1e-4, maxIterations = 100) => {
         x1 = x2;
     }
 
-    return x1; // Return last iteration if convergence not reached
+    return x1;
 };
 
-// Utility functions
 export const rad = (value) => value * Math.PI / 180;
 export const grad = (value) => value * 180 / Math.PI;
