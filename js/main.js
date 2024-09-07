@@ -11,23 +11,6 @@ import {
 import { cp_koeff, u_koeff, lymbda_koeff, pi, eps, tau, p_0, po_0, T_0 } from "./func.js";
 import {w, w_next, p_ksu, po_ksu, T_ksu, v_ksu, a_ksu, M_ksu, um_ksu} from './ksu.js';
 
-
-class Aerodynamic {
-
-    constructor() {
-
-
-    }
-
-    method1() {
-
-    }
-
-    #method2() {
-
-    }
-}
-
 function init(temperatureWall, alfaDeg, paramC, paramB, height, countMah) {
 
     // Определение параметров

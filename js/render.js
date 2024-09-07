@@ -4,7 +4,7 @@ export class Renderer {
     }
 
     createTitle(titleText) {
-        return `<h2 style="margin: 25px 0 0 0; font-size: 24px; padding:10px 5px;">${titleText}</h2>`;
+        return `<h2 style="margin: 15px 0 0 0; font-size: 18px; padding:10px 15px;background-color:#eee;border:1px solid #cdcdcd; text-align:center;">${titleText}</h2>`;
     }
 
     createTable(data, labels, startIndex) {
@@ -54,7 +54,14 @@ export class InfoDisplay {
 
     render(h, M_inf, alfa, T_st, Re_k, c, b) {
         const infoHtml = `
+            <header class="header">
+                <div class="header__image"><img src="bmstu.png" alt="Логотип"/></div>
+                <div class="header__title">created by demchekk</div>
+            </header>
             <section class="id">
+                <div class="box-image">
+                    <img src="six_place.jpg" alt="6 областей">
+                </div>
                 <h2 class="id__title">Мои ИД:</h2>
                 <dl class="id__list">
                     ${this.createInfoItem('h, [м]', h)}
