@@ -52,13 +52,11 @@ export class InfoDisplay {
         `;
     }
 
-    render(group, N, h, M_inf, alfa, T_st, Re_k, c, b) {
+    render(h, M_inf, alfa, T_st, Re_k, c, b) {
         const infoHtml = `
             <section class="id">
                 <h2 class="id__title">Мои ИД:</h2>
                 <dl class="id__list">
-                    ${this.createInfoItem('Группа', `СМ3-7${group}`)}
-                    ${this.createInfoItem('Вариант N', N)}
                     ${this.createInfoItem('h, [м]', h)}
                     ${this.createInfoItem('M, [-]', M_inf)}
                     ${this.createInfoItem('α, [град]', math.round(alfa * 180 / 3.14))}

@@ -1,241 +1,94 @@
 import { InfoDisplay, Renderer } from "./render.js"
 import { rad, grad, secantMethod } from "./utils.js";
 import { Atmosphere4401 } from "./atmos.js";
-import { ksu, v_default } from "./func.js";
+import { criticalReynoldsNumber, ksu, v_default, getOprTemp } from "./func.js";
+import {
+    Rek, delta_l_ns, tau_l_ns, Cfx_l_ns, Cf_l_ns, delta_l_ns_zv, delta_l_ns_zv_zv,
+    delta_l, tau_l, Cfx_l, Cf_l, delta_l_zv, delta_l_zv_zv, delta_x,
+    delta_t_ns, tau_t_ns, Cfx_t_ns, Cf_t_ns, delta_t_ns_zv, delta_t_ns_zv_zv,
+    delta_t, tau_t, Cfx_t, Cf_t, delta_t_zv, delta_t_zv_zv
+} from './psloy.js';
+import { cp_koeff, u_koeff, lymbda_koeff, pi, eps, tau, p_0, po_0, T_0 } from "./func.js";
+import {w, w_next, p_ksu, po_ksu, T_ksu, v_ksu, a_ksu, M_ksu, um_ksu} from './ksu.js';
+
 
 class Aerodynamic {
-    #Re_k = 5 * math.pow(10, 6) // критическое число рейнольдса [-]
-    #cp0 = 1004.7; // удельная теплоемкость воздуха [Дж/кг/К]
-    #u0 = 1.79 * math.pow(10, -5); // динамическая вязкость [Па*с]
-    #lymbda0 = 0.0232; // теплопроводность воздуха [Вт/м/К]
-
-    #betta_k = math.atan(c / b) // угол полураствора [рад]
-    #L = b / (2 * math.cos(betta_k)); // длина грани [м]
-
-    #fi = 0.1; // коэффициент [-]
-    #n = 0.76; // коэффициент [-]
-    #psi = 0.85; // коэффициент [-]
-    #k = 1.4 // коэфф адиабаты
-    #atmos = new Atmosphere4401(h); // инициализация атмосферы
-    #betta = [betta_k - alfa, betta_k + alfa, betta_k, betta_k]; // массив углов поворота
-    #thet = [secantMethod(ksu(betta[0], M_inf), rad(12)), secantMethod(ksu(betta[1], M_inf), rad(12))]; // массив СУ
-    #M = [M_inf]; // мах
-    #p = [atmos.p]; // давление 
-    #po = [atmos.po]; // плотность
-    #T = [atmos.T]; // температура
-    #a = [atmos.a] // скорость звука
-    #v = [v_default(M[0], a[0])]; // скорость потока
-
-    #um = []; // угол маха
-    #p0 = []; // давление торможения
-    #po0 = []; // плотность торможения
-    #T0 = []; // температура торможения
-    #cp = []; // удельная теплоемкость 
-    #u = []; // динамическая вязкость
-    #lymbda = []; // теплопроводность воздуха
-    #T_opr_laminar = []; // определяющая температура для ЛПС
-    #Tr_laminar = []; // температура восстановления для ЛПС
-    #T_opr_turb = []; // определяющая температура для ТПС
-    #Tr_turb = []; // температура восстановления для ТПС
-    #delta; // отклонение от оси в 5-6 областях
 
     constructor() {
-        this.N = N;
-        this.groupN = this.groupN;
-        this.alfa = rad(2 + 0.1 * N);
+
+
+    }
+
+    method1() {
+
+    }
+
+    #method2() {
 
     }
 }
 
-function init(N, groupN) {
-
-    let c, b, h, M_inf, T_st;
-    if (N <= 6) {
-        c = 80 * math.pow(10, -3);
-        b = 1000 * math.pow(10, -3);
-    } else if (N <= 12) {
-        c = 90 * math.pow(10, -3);
-        b = 1100 * math.pow(10, -3);
-    } else if (N <= 18) {   
-        c = 100 * math.pow(10, -3);
-        b = 1200 * math.pow(10, -3);
-    } else if (N <= 24) {
-        c = 110 * math.pow(10, -3);
-        b = 1300 * math.pow(10, -3);
-    }
-    if (groupN === 2) {
-        h = (10 + 0.4 * N) * math.pow(10, 3) // геометрическая высота [м]
-        M_inf = 4.5 + 0.1 * N // число маха для набегающего потока [-]
-        T_st = 373 // температура стенки [К]
-    } else if (groupN === 1) {
-        h = (10 + 0.5 * N) * math.pow(10, 3) // геометрическая высота [м]
-        M_inf = 4 + 0.15 * N // число маха для набегающего потока [-]
-        T_st = 405 // температура стенки [К]
-    }
+function init(temperatureWall, alfaDeg, paramC, paramB, height, countMah) {
 
     // Определение параметров
-    let alfa = rad(2 + 0.1 * N) // угол атаки [град]
-    let Re_k = 5 * math.pow(10, 6) // критическое число рейнольдса [-]
-    let cp0 = 1004.7; // удельная теплоемкость воздуха [Дж/кг/К]
-    let u0 = 1.79 * math.pow(10, -5); // динамическая вязкость [Па*с]
-    let lymbda0 = 0.0232; // теплопроводность воздуха [Вт/м/К]
-    let betta_k = math.atan(c / b) // угол полураствора [рад]
-    let L = b / (2 * math.cos(betta_k)); // длина грани [м]
-    let fi = 0.1; // коэффициент [-]
-    let n = 0.76; // коэффициент [-]
-    let psi = 0.85; // коэффициент [-]
-    let k = 1.4 // коэфф адиабаты
-    let atmos = new Atmosphere4401(h); // инициализация атмосферы
-    let betta = [betta_k - alfa, betta_k + alfa, betta_k, betta_k]; // массив углов поворота
-    let thet = [secantMethod(ksu(betta[0], M_inf), rad(12)), secantMethod(ksu(betta[1], M_inf), rad(12))]; // массив СУ
-    let M = [M_inf]; // мах
-    let p = [atmos.p]; // давление 
-    let po = [atmos.po]; // плотность
-    let T = [atmos.T]; // температура
-    let a = [atmos.a] // скорость звука
-    let v = [v_default(M[0], a[0])]; // скорость потока
-    let um = []; // угол маха
-    let p0 = []; // давление торможения
-    let po0 = []; // плотность торможения
-    let T0 = []; // температура торможения
-    let cp = []; // удельная теплоемкость 
-    let u = []; // динамическая вязкость
-    let lymbda = []; // теплопроводность воздуха
-    let T_opr_laminar = []; // определяющая температура для ЛПС
-    let Tr_laminar = []; // температура восстановления для ЛПС
-    let T_opr_turb = []; // определяющая температура для ТПС
-    let Tr_turb = []; // температура восстановления для ТПС
-    let delta; // отклонение от оси в 5-6 областях
-
-    // Критическое число рейнольдса через аппроксимацию
-    const criticalReynoldsNumber = (Tr, M) => {
-        const Tst_otn = T_st / Tr; // Относительная температура стенки;
-        const x = (Tst_otn - 1) / (M * M);
-        const y = 1 - 16 * x - 412.5 * math.pow(x, 2) - 35000 * math.pow(x, 3) - 375000 * math.pow(x, 4);
-        return 5 * math.pow(10, 6) * y
-    }
+    const T_st = temperatureWall;
+    const alfa = rad(alfaDeg);
+    const c = paramC * math.pow(10, -3);
+    const b = paramB * math.pow(10, -3);
+    const h = height;
+    const M_inf = countMah;
+    const Re_k = 5 * math.pow(10, 6) // критическое число рейнольдса [-]
+    const betta_k = math.atan(c / b) // угол полураствора [рад]
+    const L = b / (2 * math.cos(betta_k)); // длина грани [м]
+    const betta = [betta_k - alfa, betta_k + alfa, betta_k, betta_k]; // массив углов поворота
+    const thet = [secantMethod(ksu(betta[0], M_inf), rad(12)), secantMethod(ksu(betta[1], M_inf), rad(12))]; // массив СУ
+    const M = [M_inf]; // мах
+    const atmos = new Atmosphere4401(h); // инициализация атмосферы
+    const p = [atmos.p]; // давление 
+    const po = [atmos.po]; // плотность
+    const T = [atmos.T]; // температура
+    const a = [atmos.a] // скорость звука
+    const v = [v_default(M[0], a[0])]; // скорость потока
+    const um = []; // угол маха
+    const p0 = []; // давление торможения
+    const po0 = []; // плотность торможения
+    const T0 = []; // температура торможения
+    const cp = []; // удельная теплоемкость 
+    const u = []; // динамическая вязкость
+    const lymbda = []; // теплопроводность воздуха
+    const T_opr_laminar = []; // определяющая температура для ЛПС
+    const Tr_laminar = []; // температура восстановления для ЛПС
+    const T_opr_turb = []; // определяющая температура для ТПС
+    const Tr_turb = []; // температура восстановления для ТПС
 
     // Число рейнольдса
     const reynoldsNumber = (po, V, u, x = L) => po * V * x / u;
 
-    const w = (M) => math.sqrt((k + 1) / (k - 1)) * math.atan(math.sqrt((M * M - 1) * (k - 1) / (k + 1))) - math.atan(math.sqrt(M * M - 1))
-    const w_next = (w) => w + 2 * betta_k
-
-    const p_ksu = (M, thet, p_prev) => p_prev * (math.pow(M, 2) * math.pow(math.sin(thet), 2) * 2 * k / (k + 1) - (k - 1) / (k + 1));
-    const po_ksu = (M, thet, po_prev) => po_prev * ((0.5 * (k + 1) * math.pow(M, 2) * math.pow(math.sin(thet), 2)) / (1 + 0.5 * (k - 1) * math.pow(M, 2) * math.pow(math.sin(thet), 2)));
-    const T_ksu = (T_prev, p, po_inf, p_inf, po) => T_prev * p * po_inf / (p_inf * po);
-    const v_ksu = (v_prev, thet, betta) => v_prev * math.cos(thet) / math.cos(thet - betta);
-    const a_ksu = (p, po) => math.sqrt(k * p / po);
-    const M_ksu = (v, a) => v / a;
-    const um_ksu = M => math.asin(1 / M);
-
-    // Параметры торможения
-    const p_0 = (M, p_prev) => p_prev * pi(M)
-    const po_0 = (M, po_prev) => po_prev * eps(M)
-    const T_0 = (M, T_prev) => T_prev * tau(M)
-
-    // Удельная теплоемкость / динамическая вязкость / теплопроводность воздуха
-    const cp_koeff = T => cp0 * math.pow(T / 288.15, fi)
-    const u_koeff = T => u0 * math.pow(T / 288.15, n)
-    const lymbda_koeff = T => lymbda0 * math.pow(T / 261, psi)
-
-    // Газодинамические функции
-    const pi = M => math.pow(1 + math.pow(M, 2) * (k - 1) / 2, k / (k - 1)); // для отношения pi = p/p0
-    const eps = M => math.pow(1 + math.pow(M, 2) * (k - 1) / 2, 1 / (k - 1)); // для отношения eps = po/po0
-    const tau = M => (1 + math.pow(M, 2) * (k - 1) / 2); // для отношения tau = T/T0
-
     // Средний коэффициент трения для смешанного ПС
-    const Cfsm = (ps) => {
-        return (ps[11][1] * ps[1][1] + ps[11][5] * ps[1][5] - ps[11][2] * ps[1][2]) / L;
-    }
+    const Cfsm = ps => (ps[11][1] * ps[1][1] + ps[11][5] * ps[1][5] - ps[11][2] * ps[1][2]) / L;
 
     // Средний коэффициент трения для ТПС
-    const Cfturb = (ps) => {
-        return (ps[11][8] * ps[1][8] - ps[11][6] * ps[1][6]) / L
-    }
+    const Cfturb = ps => (ps[11][8] * ps[1][8] - ps[11][6] * ps[1][6]) / L
 
     // Скоростной напор
-    const q = (po, v) => {
-        return po * v * v / 2;
-    }
-
-    // Расчет определяющей температуры и температуры восстановления 1-4 грани
-    const getOprTemp = (flow, T, M) => {
-        const Cp_opr = T => 1004.7 * Math.pow(T / 288.15, 0.1);
-        const u_opr = T => 1.79e-5 * Math.pow(T / 288.15, 0.76);
-        const lymbda_opr = T => 0.0232 * Math.pow(T / 261, 0.86);
-
-        const r_opr = (Cp, u, lymbda, extent) => Math.pow(Cp * u / lymbda, extent);
-        const Tr_opr = (T, r, M) => T * (1 + r * (k - 1) * M * M / 2);
-        const T_opr = (Tr, T) => (T_st + T) / 2 + 0.22 * (Tr - T);
-
-        let T_z = (T_st + T) / 2;
-        let T_z_previous;
-        let r_init = flow === 'turb' ? 0.88 : 0.83;
-        let extent = flow === 'turb' ? 1 / 3 : 1 / 2;
-
-        while (Math.abs(T_z - (T_z_previous ?? 0)) > (T_z * 0.01)) {
-            T_z_previous = T_z;
-            const Tr = Tr_opr(T, r_init, M);
-            T_z = T_opr(Tr, T);
-            r_init = r_opr(Cp_opr(T_z), u_opr(T_z), lymbda_opr(T_z), extent);
-        }
-
-        return [T_z, Tr_opr(T, r_init, M)];
-    }
+    const q = (po, v) => po * v * v / 2;
 
     // Расчет параметров ПС 1-4 грани
     const getSloy = (x_kr, inc) => {
 
-        // Несжимаемый ЛПС
-        const Rek = (v, po, x, u) => v * po * x / u;
-        const delta_l_ns = (x, Re) => 4.64 * x / math.sqrt(Re);
-        const tau_l_ns = (po, v, Re) => 0.323 * po * math.pow(v, 2) / math.sqrt(Re);
-        const Cfx_l_ns = Re => 0.646 / math.sqrt(Re);
-        const Cf_l_ns = Re => 1.292 / math.sqrt(Re);
-        const delta_l_ns_zv = (Re, x) => 1.74 * x / math.sqrt(Re);
-        const delta_l_ns_zv_zv = (Re, x) => 0.646 * x / math.sqrt(Re);
-
-        // Сжимаемый ЛПС
-        const delta_l = (delta, T_opr, T) => delta * math.pow(T_opr / T, (n + 1) / 2);
-        const tau_l = (tau, T_opr, T) => tau * math.pow(T_opr / T, (n - 1) / 2);
-        const Cfx_l = (Cfx, T_opr, T) => Cfx * math.pow(T_opr / T, (n - 1) / 2);
-        const Cf_l = (Cf, T_opr, T) => Cf * math.pow(T_opr / T, (n - 1) / 2);
-        const delta_l_zv = (delta_ns_zv, delta_l, delta_l_ns) => delta_ns_zv * delta_l / delta_l_ns;
-        const delta_l_zv_zv = (delta_ns_zv_zv, Cfx_l, Cfx_l_ns) => delta_ns_zv_zv * Cfx_l / Cfx_l_ns;
-
-        // Расстояние перехода для ПС
-        const delta_x = (delta, v, po, u) => math.pow(math.pow(delta, 5) * v * po / (u * math.pow(0.37, 5)), 1 / 4)
-
-        // Несжимаемый ТПС
-        const delta_t_ns = (x, Re) => 0.37 * x / math.pow(Re, 1 / 5);
-        const tau_t_ns = (po, v, Re) => 0.0255 * po * math.pow(v, 2) / math.pow(Re, 1 / 5);
-        const Cfx_t_ns = Re => 0.0578 / math.pow(Re, 1 / 5);
-        const Cf_t_ns = Re => 0.074 / math.pow(Re, 1 / 5);
-        const delta_t_ns_zv = delta_t_ns => delta_t_ns / 8;
-        const delta_t_ns_zv_zv = delta_t_ns => 7 * delta_t_ns / 72;
-
-        // Сжимаемый ТПС
-        const delta_t = (delta, T_opr, T) => delta * math.pow(T_opr / T, (n + 1) / 5);
-        const tau_t = (tau, T_opr, T) => tau * math.pow(T_opr / T, (n - 4) / 5);
-        const Cfx_t = (Cfx, T_opr, T) => Cfx * math.pow(T_opr / T, (n - 4) / 5);
-        const Cf_t = (Cf, T_opr, T) => Cf * math.pow(T_opr / T, (n - 4) / 5);
-        const delta_t_zv = (delta_t_ns_zv, delta_t, delta_t_ns) => delta_t_ns_zv * delta_t / delta_t_ns;
-        const delta_t_zv_zv = (delta_t_ns_zv_zv, Cfx_t, Cfx_t_ns) => delta_t_ns_zv_zv * Cfx_t / Cfx_t_ns;
-
-        let xarr = [x_kr / 2, x_kr];
-        let delta_ns = [];
-        let tau_ns = [];
-        let Cfx_ns = [];
-        let Cf_ns = [];
-        let delta_ns_zv = [];
-        let delta_ns_zv_zv = [];
-        let delta_ = [];
-        let tau = [];
-        let Cfx = [];
-        let Cf = [];
-        let delta_zv = [];
-        let delta_zv_zv = [];
+        const xarr = [x_kr / 2, x_kr];
+        const delta_ns = [];
+        const tau_ns = [];
+        const Cfx_ns = [];
+        const Cf_ns = [];
+        const delta_ns_zv = [];
+        const delta_ns_zv_zv = [];
+        const delta_ = [];
+        const tau = [];
+        const Cfx = [];
+        const Cf = [];
+        const delta_zv = [];
+        const delta_zv_zv = [];
 
         xarr.forEach(
             (x, i) => {
@@ -257,7 +110,7 @@ function init(N, groupN) {
         )
         let po_zv = po[inc] * T[inc] / T_opr_laminar[inc - 1];
         let u_zv = u_koeff(T_opr_laminar[inc - 1]);
-        let x_kr1 = criticalReynoldsNumber(Tr_laminar[inc - 1], M[inc]) * u[inc] / (po[inc] * v[inc]);
+        let x_kr1 = criticalReynoldsNumber(Tr_laminar[inc - 1], M[inc], T_st) * u[inc] / (po[inc] * v[inc]);
         let Re_krit = po_zv * v[inc] * x_kr1 / u_zv;
         let delta_xk = math.pow((4.64 * x_kr1 * math.pow(po_zv * v[inc] / u_zv, 0.2)) / (math.sqrt(Re_krit) * 0.37), 1.25)
         let b = L - x_kr;
@@ -357,7 +210,7 @@ function init(N, groupN) {
         }
         for (let i = 1; i <= 2; i++) {
             const w0 = w(M[i]);
-            const prandtl = (M) => w_next(w0) - w(M);
+            const prandtl = (M) => w_next(w0, betta_k) - w(M);
             const Mt = secantMethod(prandtl, 4);
             const pt = p0[i] / pi(Mt);
             const po_t = po0[i] / eps(Mt);
@@ -374,7 +227,7 @@ function init(N, groupN) {
 
         // Расчет параметров в конце ромба
         (function posled() {
-            delta = rad(0);
+            let delta = rad(0);
             let p_arr = [1, 0];
             let thet_arr = [0, 0];
             while (math.abs(p_arr[0] - p_arr[1]) / p_arr[0] >= math.pow(10, -4)) {
@@ -428,7 +281,7 @@ function init(N, groupN) {
     paramPush();
 
     // АДХ без трения
-    const q_inf = po[0] * v[0] * v[0] / 2; // Скоростной напор набегающего потока
+    const q_inf = q(po[0],v[0]);
     const X1 = X(p[1]);
     const X2 = X(p[2]);
     const X3 = X(p[3]);
@@ -451,8 +304,8 @@ function init(N, groupN) {
 
     // Определяющая температура и температура восстановления
     for (let i = 1; i <= 4; i++) {
-        const [T_iter_laminar_opr, Tr_iter_laminar] = getOprTemp('laminar', T[i], M[i]);
-        const [T_iter_turb_opr, Tr_iter_turb] = getOprTemp('turb', T[i], M[i]);
+        const [T_iter_laminar_opr, Tr_iter_laminar] = getOprTemp('laminar', T[i], M[i], T_st);
+        const [T_iter_turb_opr, Tr_iter_turb] = getOprTemp('turb', T[i], M[i], T_st);
         T_opr_laminar.push(T_iter_laminar_opr);
         T_opr_turb.push(T_iter_turb_opr);
         Tr_turb.push(Tr_iter_turb);
@@ -462,8 +315,8 @@ function init(N, groupN) {
     // Число Рейнольдса и критические точки ПС
     const Re_l1 = reynoldsNumber(po[1], v[1], u[1]);
     const Re_l2 = reynoldsNumber(po[2], v[2], u[2]);
-    const Re_kr1 = criticalReynoldsNumber(Tr_laminar[0], M[1]);
-    const Re_kr2 = criticalReynoldsNumber(Tr_laminar[1], M[2]);
+    const Re_kr1 = criticalReynoldsNumber(Tr_laminar[0], M[1], T_st);
+    const Re_kr2 = criticalReynoldsNumber(Tr_laminar[1], M[2], T_st);
     const x_kr1 = Re_kr1 * u[1] / (v[1] * po[1]);
     const x_kr2 = Re_kr2 * u[2] / (v[2] * po[2]);
 
@@ -493,13 +346,12 @@ function init(N, groupN) {
     // Блок отрисовки таблиц
     const getIdTable = new InfoDisplay('#app');
     const getResultTable = new Renderer('#app');
-    getIdTable.render(groupN, N, h, M_inf, alfa, T_st, Re_k, c, b);
+    getIdTable.render(h, M_inf, alfa, T_st, Re_k, c, b);
     getResultTable.render([[M[0]], [p[0]], [T[0]], [po[0]], [a[0]]], ['M, [-]', 'p, [Па]', 'T, [K]', 'po, [кг/м3]', 'a, [м/с]'], 2, 'Параметры атмосферы')
     getResultTable.render([M, p, T, po, a, cp, u, lymbda], ['M, [-]', 'p, [Па]', 'T, [K]', 'po, [кг/м3]', 'a, [м/с]', 'Cp, [Дж/кг*К]', 'μ, [Па*с]', 'λ, [Вт/м*К]'], 0, 'Параметры в 6 областях, где 0 - набегающий поток')
     getResultTable.render([T0, p0, po0], ['T0, [K]', 'p0, [Па]', 'po, [кг / м3]'], 0, 'Параметры торможения')
     getResultTable.render([thet.map(el => grad(el))], ['θ, [град]'], 1, 'Угол наколна СУ')
     getResultTable.render([um.map(el => grad(el)), betta.map(el => grad(el))], ['μ, [град]', 'β, [град]'], 1, 'Угол наклона маха и поворота потока')
-    getResultTable.render([[delta * 180 / math.pi]], ['delta, [град]'], 2, 'Отклонение от оси в 5-6 областях')
     getResultTable.render([Tr_laminar, T_opr_laminar, Tr_turb, T_opr_turb], ['Tr (л), [K]', 'T* (л), [K]', 'Tr (т), [K]', 'T* (т), [K]'], 1, 'Определяющая температура');
     getResultTable.render([[Re_kr1, Re_l1], [Re_kr2, Re_l2]], ['Re_кр1 / Re_l1, [-]', 'Re_кр2 / Re_l2, [-]'], 2, 'Критическое / Обычное число Рейнольдса');
     getResultTable.render([[x_kr1], [x_kr2]], ['Xкр1, [м]', 'Xкр2, [м]'], 2, '1-ая и 2-ая критическая точка в смешанном ПС');
@@ -514,8 +366,7 @@ const exampleModal = document.getElementById('exampleModal');
 exampleModal.addEventListener('show.bs.modal', function (event) {
     event.stopPropagation();
     const divArea = document.querySelector('.area');
-    const modalBodyInput = this.querySelector('#group-number')
-    const modalBodyInputGroup = this.querySelector('#group')
+
     const modal_T_st = this.querySelector('#T_st');
     const modal_alfa = this.querySelector('#alfa');
     const modal_c = this.querySelector('#c');
@@ -523,26 +374,27 @@ exampleModal.addEventListener('show.bs.modal', function (event) {
     const modal_M_inf = this.querySelector('#M_inf');
     const modal_h = this.querySelector('#h');
     const modalFooterButton = this.querySelector('.modal-footer button')
+
     // Кнопка, запускающая модальное окно
     const button = event.relatedTarget
+
     modalFooterButton.addEventListener('click', () => {
-        console.log("Tst",+modal_T_st.value);
-        console.log("alfa",+modal_alfa.value);
-        console.log("c",+modal_c.value);
-        console.log("b",+modal_b.value);
-        console.log("Minf",+modal_M_inf.value);
-        console.log("h",+modal_h.value);
+        console.log("Tst", +modal_T_st.value);
+        console.log("alfa", +modal_alfa.value);
+        console.log("c", +modal_c.value);
+        console.log("b", +modal_b.value);
+        console.log("Minf", +modal_M_inf.value);
+        console.log("h", +modal_h.value);
 
         const T_st = +modal_T_st.value;
         const alfa = +modal_alfa.value;
         const c = +modal_c.value;
         const b = +modal_b.value;
         const h = +modal_h.value;
+        const M_inf = +modal_M_inf.value;
 
-        const value = +modalBodyInput.value;
-        const group = +modalBodyInputGroup.value;
         button.remove();
         divArea.remove();
-        init(value, group);
+        init(T_st, alfa, c, b, h, M_inf);
     })
 })

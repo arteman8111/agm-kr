@@ -174,8 +174,8 @@ button,
 
 .area{
     position: absolute;
-    background: #4e54c8;  
-    background: -webkit-linear-gradient(to left, #8f94fb, #4e54c8);  
+    background: #ff004e;  
+    background: -webkit-linear-gradient(to left, #ff004e50, #ff004e);  
     width: 100%;
     height:100vh;
     z-index: -111;
@@ -278,7 +278,19 @@ button,
     animation-duration: 8s;
 }
 
+.button-calc {
+    color: #fff;
+    font-weight: 500;
+    text-transform: uppercase;
+    display: block;
+    padding: 10px 15px;
+    background-color: #ff004e;
+    border: none;
+}
 
+.button-calc:hover {
+    background-color: #ff004e90;
+}
 
 @keyframes animate {
 
